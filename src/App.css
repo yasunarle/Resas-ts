@@ -1,0 +1,47 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body * {
+  margin: 0;
+  padding: 0;
+  color: #16161a;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+    "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.app {
+  text-align: center;
+  background-color: #fffffe;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.app__content {
+  max-width: 800px;
+  padding: 30px;
+  margin: auto;
+}
+
+.prefectures-container {
+  text-align: left;
+}
+
+.prefectures-container .prefecture {
+  display: inline-block;
+  padding: 2px;
+}
+
+.prefecture-container__title {
+  color: #078080;
+  text-align: left;
+}
+
+/* .prefectures-container {} */
+
+.recharts-wrapper {
+  margin: auto;
+}

@@ -1,9 +1,11 @@
 import React from "react"
+// CSS
+import "./TheHeader.css"
 
 function TheHeader() {
   return (
-    <div>
-      <span>SESAS App</span>
+    <div className="header">
+      <h1>SESAS APP</h1>
     </div>
   )
 }
