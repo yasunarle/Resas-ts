@@ -8,13 +8,24 @@ const headers = {
   "X-API-KEY": process.env.REACT_APP_RESAS_API_KEY,
 }
 
-export const getPrefectures = async (): Promise<Prefecture[]> => {
+export const getPrefectures = async (): Promise<Prefecture[] | void> => {
   const url = endPoint + "/prefectures"
-  const prefectures = await axios
-    .get(url, { headers })
-    .then((_res) => _res.data)
-    .then((_data) => _data.result)
-  return prefectures
+  try {
+    const prefectures = await axios
+      .get(url, { headers })
+      .then((_res) => _res.data)
+      .then((_data) => {
+        if (!_data.result) {
+          console.error(_data)
+          return
+        }
+        return _data.result
+      })
+    return prefectures
+  } catch (err) {
+    console.log("--- Error")
+    console.error(err)
+  }
 }
 
 export const getPrefectureData = async (prefecture: Prefecture): Promise<string[]> => {
