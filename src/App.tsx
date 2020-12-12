@@ -8,12 +8,14 @@ import { Prefecture, StatePrefectures, CheckedPrefectures } from "./types/prefec
 // Utils
 import { getPrefectures, getPrefectureData } from "./utils/resas"
 
+const pointStartYear = 1960
+
 function App() {
   // Note: Local State
   const [prefectures, setPrefectures] = useState<StatePrefectures>([])
   const [checkedPrefectures, setCheckedPrefectures] = useState<CheckedPrefectures>([])
   // Note: Methods
-  const initPrefectures = async () => {
+  const initPrefectures = async (): Promise<void> => {
     const _prefectures = await getPrefectures()
     setPrefectures(_prefectures)
   }
@@ -24,6 +26,7 @@ function App() {
       setCheckedPrefectures((value) => [...value, { ...prefecture, data }])
       return
     }
+
     setCheckedPrefectures((value) =>
       value.filter((_prefecture) => _prefecture.prefCode !== prefecture.prefCode)
     )
@@ -31,7 +34,6 @@ function App() {
   // Note: Computed
 
   const chartOptions = useMemo(() => {
-    console.log("--- useMemo")
     const series = checkedPrefectures.map((prefecture) => ({
       name: prefecture.prefName,
       data: prefecture.data,
@@ -39,17 +41,17 @@ function App() {
 
     return {
       title: {
-        text: "総人口",
+        text: "Total Population",
       },
       yAxis: {
         title: {
-          text: "総人口数",
+          text: "人口数",
         },
       },
       plotOptions: {
         series: {
           pointInterval: 5,
-          pointStart: 1960,
+          pointStart: pointStartYear,
         },
       },
       series,
@@ -83,7 +85,7 @@ function App() {
         {checkedPrefectures.length ? (
           <HighchartsReact highcharts={Highcharts} options={chartOptions} />
         ) : (
-          <p>選択されてません</p>
+          <h3>選択されてません</h3>
         )}
       </div>
       <h1>Checked</h1>
