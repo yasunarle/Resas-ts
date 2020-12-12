@@ -1,81 +1,69 @@
-import React, { useState, useEffect } from "react"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts"
+import React, { useState, useEffect, useMemo } from "react"
 import Highcharts from "highcharts"
 import HighchartsReact from "highcharts-react-official"
 // Scss
 import "./App.scss"
 // Types
-import { Prefecture, StatePrefectures } from "./types/prefecture"
+import { Prefecture, StatePrefectures, CheckedPrefectures } from "./types/prefecture"
 // Utils
-import { getPrefectures } from "./utils/resas"
+import { getPrefectures, getPrefectureData } from "./utils/resas"
 
-const initSampleData = [
-  { year: "1980", tokyo: 200 },
-  { year: "1990", tokyo: 300 },
-]
 function App() {
-  const [sampleData, setSampleData] = useState(initSampleData)
-  const [sampleCheckedPres, setSampleCheckedPres] = useState<string[]>(["tokyo"])
-  // State
+  // Note: Local State
   const [prefectures, setPrefectures] = useState<StatePrefectures>([])
-  const [checkedPrefectures, setCheckedPrefectures] = useState<StatePrefectures>([])
+  const [checkedPrefectures, setCheckedPrefectures] = useState<CheckedPrefectures>([])
   // Note: Methods
   const initPrefectures = async () => {
     const _prefectures = await getPrefectures()
     setPrefectures(_prefectures)
   }
-  const checkPrefecture = (prefecture: Prefecture, isChecked: boolean): void => {
+  const checkPrefecture = async (prefecture: Prefecture, isChecked: boolean) => {
+    // Todo: キャッシュ済み ? フラグ管理 : フェッチする
     if (isChecked) {
-      setCheckedPrefectures((value) => [...value, prefecture])
+      const data = await getPrefectureData(prefecture)
+      setCheckedPrefectures((value) => [...value, { ...prefecture, data }])
       return
     }
     setCheckedPrefectures((value) =>
       value.filter((_prefecture) => _prefecture.prefCode !== prefecture.prefCode)
     )
   }
+  // Note: Computed
+
+  const chartOptions = useMemo(() => {
+    console.log("--- useMemo")
+    const series = checkedPrefectures.map((prefecture) => ({
+      name: prefecture.prefName,
+      data: prefecture.data,
+    }))
+
+    return {
+      title: {
+        text: "総人口",
+      },
+      yAxis: {
+        title: {
+          text: "総人口数",
+        },
+      },
+      plotOptions: {
+        series: {
+          pointInterval: 5,
+          pointStart: 1960,
+        },
+      },
+      series,
+    }
+  }, [checkedPrefectures])
+
   // Note: Created
   useEffect(() => {
     initPrefectures()
   }, [])
-  const options = {
-    title: {
-      text: "総人口",
-    },
-    yAxis: {
-      title: {
-        text: "総人口数",
-      },
-    },
-    plotOptions: {
-      series: {
-        pointInterval: 5,
-        pointStart: 1960,
-      },
-    },
-    series: [
-      {
-        name: "東京",
-        data: [100, 2000, 3000],
-      },
-    ],
-  }
+
   return (
     <div className="App">
-      <h1>sampole</h1>
-      <div>
-        {sampleData.length ? (
-          <HighchartsReact highcharts={Highcharts} options={options} />
-        ) : (
-          <p>選択されてません</p>
-        )}
-      </div>
-
-      <h1>Checked</h1>
-      <div>
-        {checkedPrefectures.map((prefecture) => (
-          <span key={prefecture.prefCode}>{prefecture.prefName}</span>
-        ))}
-      </div>
+      <h1>Resas API App</h1>
       <h2>都道府県一覧</h2>
       <div>
         {prefectures.map((prefecture) => (
@@ -91,18 +79,19 @@ function App() {
           </span>
         ))}
       </div>
-      {/* <div>
-        <LineChart width={600} height={400} data={sampleData}>
-          <XAxis dataKey="year" />
-          <YAxis />
-          {sampleCheckedPres.map((prefecture) => (
-            <Line type="monotone" dataKey={prefecture} stroke="#ff7300" yAxisId={0} />
-          ))}
-
-          <Tooltip />
-          <CartesianGrid stroke="#f5f5f5" />
-        </LineChart>
-      </div> */}
+      <div>
+        {checkedPrefectures.length ? (
+          <HighchartsReact highcharts={Highcharts} options={chartOptions} />
+        ) : (
+          <p>選択されてません</p>
+        )}
+      </div>
+      <h1>Checked</h1>
+      <div>
+        {checkedPrefectures.map((prefecture) => (
+          <span key={prefecture.prefCode}>{prefecture.prefName}</span>
+        ))}
+      </div>
     </div>
   )
 }

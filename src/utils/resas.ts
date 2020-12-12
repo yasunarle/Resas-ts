@@ -16,6 +16,7 @@ export const getPrefectures = async (): Promise<Prefecture[]> => {
     .then((_data) => _data.result)
   return prefectures
 }
+
 export const getPrefectureData = async (prefecture: Prefecture): Promise<string[]> => {
   const url = endPoint + "/population/composition/perYear"
   const res = await axios.get(url, {
@@ -27,12 +28,8 @@ export const getPrefectureData = async (prefecture: Prefecture): Promise<string[
   })
   const totalPopulationDatas = res.data.result.data[0].data
 
-  console.log("---")
-  let li: string[] = []
-  totalPopulationDatas.forEach((data: PopulationTransitionData) => {
-    li.push(data.value)
-  })
-  return li
+  const result = totalPopulationDatas.map((data: PopulationTransitionData) => data.value)
+  return result
 }
 
 // function initResas() {
