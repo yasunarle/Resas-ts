@@ -15,3 +15,15 @@ In the project directory, you can run:
 install Some librarys that need in this project.
 
 ### `yarn install`
+
+ESlint
+
+### `yarn lint`
+
+### `yarn lint:fix`
+
+prettier
+
+### `yarn prettier`
+
+### `yarn prettier:fix`
